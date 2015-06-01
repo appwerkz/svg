@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>NB Play</title>
+        <!--
+        <link rel="stylesheet" href="../../docs/fonts/stylesheet.css">
+        <link rel="stylesheet" href="../../docs/css/prism.css">
+        <link rel="stylesheet" href="stylesheet.css">-->
+        <style media="screen">
+            body {
+                width: 100%;
+                height: 100%;
+            }
+            #svg {
+                -moz-border-radius: 10px;
+                -webkit-border-radius: 10px;
+                border-radius: 10px;
+                border: solid 2px #ccc;
+                width: 700px;
+                height: 600px;
+                float: left;
+                margin-right: 10px;
+                font: 1em source-sans-pro, Source Sans Pro, Helvetica, sans-serif;
+            }
+        </style>
+        <script src="lib/Snap.svg-0.4.1/dist/snap.svg-min.js"></script>
+        <script src="lib/Snap.svg-0.4.1/doc/js/prism.js"></script>
+        <script>
+        var S;
+        window.onload = function () {
+            var s = Snap("#svg"); 
+
+            var move = function(dx,dy) {
+                this.attr({
+                            transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
+                        });
+            };
+            
+            var start = function() {
+                    this.data('origTransform', this.transform().local );
+            };
+            var stop = function() {
+                console.log('finished dragging');
+                rectCreate();
+            };
+            
+            var rectCreate = function() {
+                var shape = s.rect(550,100,50,50,0,0).attr({ stroke: '#3b3b3b', 'strokeWidth': 2, fill: 'red', 'opacity': 1.0 });
+                shape.attr({'name': 'rect'});
+                return shape;
+            }
+            var circleCreate = function() {
+                var shape = s.circle(550, 200, 25).attr({ stroke: '#3b3b3b', 'strokeWidth': 2, fill: 'red', 'opacity': 1.0 });
+                shape.attr({'name': 'circle'});
+                return shape;
+            }
+            
+            //lets draw 2 rects at position 100,100 and then reposition them
+            var divider = s.line(500, 0, 500, 600).attr({ stroke: '#3b3b3b', 'strokeWidth': 2, fill: 'red', 'opacity': 0.5 });
+            var rTop, rBottom;
+            var shapes = ['rect':[], 'circle': []];
+            
+            var shapeInPallette = function(createShapeFn, shapeName) {
+                shapeLayers = shapes[shapeName];
+                if(shapeLayers['bottom'] != null) {
+                    shapeLayers['top'] = shapeLayers['bottom'];
+                } else {
+                    shapeLayers['top'] = createShapeFn();
+                }
+                shapeLayers['bottom'] = shapeLayers['top'].clone();
+                shapeLayers['bottom'].insertBefore(rTop);                    
+                shapeLayers['top'].drag(move, start, stop);                
+            };
+            shapeInPalette(rectCreate);
+            shapeInPallette(circleCreate)
+
+            
+            var t = s.text(100,50,'Snap("#svg") should reference an svg element, not a div. Or create it by supplying width,height Snap(100,100)');
+
+        };
+        </script>
+    </head>
+    <body>
+        <svg id="svg"></svg>
+
+    </body>
+</html>
